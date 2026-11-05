@@ -3,7 +3,7 @@ export const ERNIE={x:2625,groundY:300,scale:1.7};
 export function drawErnie(ctx,drawCat){
  const {x,groundY,scale}=ERNIE;
  ctx.save();
- drawCat(x,groundY-14-16*scale,-1,true,scale,0,{fur:'#8e7964',light:'#ead8bb',stripe:'#635344'});
+ drawCat(x,groundY-14-16*scale,-1,true,scale,0,{fur:'#dc8b3d',light:'#f5d29a',stripe:'#ac602b'});
  // A blue collar helps distinguish Ernie from Mew and the patrolling cats.
  ctx.fillStyle='#739ea8';ctx.beginPath();ctx.roundRect(x-4,groundY-43,10,5,2);ctx.fill();
  ctx.fillStyle='#d4b169';ctx.beginPath();ctx.roundRect(x,groundY-39,4,5,1);ctx.fill();

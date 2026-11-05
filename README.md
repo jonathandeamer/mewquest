@@ -16,4 +16,4 @@ Jenn’s doorstep character uses `dist/assets/jenn-welcome.png`, a transparent i
 ## Music
 “Garden Treasures” is an original 35.56-second chiptune loop: a lilting 6/8 melody, plucked arpeggios and triangle-like bass, with a stately British television/antique-fair mood. No television melody or recording is sampled. Start playing and select **Sound on** to hear it. Music pauses with the game, focus loss and the reunion screen; muting silences music and effects. Regenerate the bundled WAV with `python3 scripts/compose-soundtrack.py`.
 
-Ernie, a larger friendly brown tabby with a blue collar, waits on the platform near the midpoint and greets Mew with “ Hello Mew!” in a speech bubble. He is scenery, not a collision obstacle.
+Ernie, a larger friendly ginger tom with a blue collar, waits on the platform near the midpoint and greets Mew with “ Hello Mew!” in a speech bubble. He is scenery, not a collision obstacle.
