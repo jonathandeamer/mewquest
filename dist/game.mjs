@@ -1,4 +1,4 @@
-import{drawErnie}from'./ernie.mjs';
+import{drawErnie,drawMewGreeting}from'./ernie.mjs';
 import{syncMusic}from'./music.mjs';
 import{drawJennSprite}from'./jenn-sprite.mjs';
 import{createGame,step,reset,returnToCheckpoint,W,H}from'./engine.mjs';
@@ -42,6 +42,7 @@ function draw(){ctx.clearRect(0,0,W,H);backdrop();ctx.save();ctx.translate(-came
  for(let treat of g.treats)if(!g.collected.has(treat.id)){let yy=treat.y+(reduced?0:Math.sin(g.time*2+treat.id)*3);rect(treat.x-9,yy-6,18,12,'#78502f',2);rect(treat.x-7,yy-5,14,3,'#bc8a52',1);rect(treat.x-7,yy+2,14,2,'#5b3924',1);rect(treat.x-3,yy-1,2,2,'#95643b');rect(treat.x+3,yy,2,2,'#95643b');}
  drawErnie(ctx,cat);jenn();for(let c of g.cats)cat(c.x,c.y,c.speed>0?1:-1,false,1,g.time*7);
  let p=g.player;if(p.dashTimer>0){for(let i=1;i<4;i++){ctx.globalAlpha=.16*(4-i);cat(p.x-p.face*i*13,p.y,p.face,true,1,0);}ctx.globalAlpha=1;}ellipse(p.x+14,p.y+29,19,4,'#5a6a3c20');cat(p.x,p.y,p.face,true,1,p.grounded&&Math.abs(p.vx)>20?g.time*19:0);
+ if(g.mewGreetingTime>0)drawMewGreeting(ctx,p);
  if(!playing){text('Mew',p.x-1,p.y-22,13,'#727d54');}
  if(g.won){text('♡',p.x+20,p.y-35,25,'#b77f70');text('♡',5224,282,21,'#b77f70');}
  ctx.restore();
