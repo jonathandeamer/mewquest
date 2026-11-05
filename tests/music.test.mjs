@@ -1,0 +1,4 @@
+import{test}from'node:test';import assert from'node:assert/strict';
+import{syncMusic}from'../dist/music.mjs';
+test('music loops quietly only during enabled active gameplay',()=>{let plays=0,pauses=0;let media={paused:true,play(){plays++;this.paused=false;return Promise.resolve();},pause(){pauses++;this.paused=true;}};syncMusic(media,{enabled:true,active:true});assert.equal(plays,1);assert.equal(media.loop,true);assert.equal(media.volume,.22);syncMusic(media,{enabled:true,active:true});assert.equal(plays,1);syncMusic(media,{enabled:true,active:false});assert.equal(pauses,1);syncMusic(media,{enabled:true,active:true});assert.equal(plays,2);syncMusic(media,{enabled:false,active:true});assert.equal(pauses,2);});
+test('blocked playback does not interrupt gameplay',async()=>{let media={paused:true,play(){return Promise.reject(new Error('autoplay blocked'));},pause(){}};syncMusic(media,{enabled:true,active:true});await new Promise(r=>setImmediate(r));});
