@@ -9,7 +9,7 @@ test('Enter starts from the title screen, C jumps, and Space no longer jumps',as
  globalThis.window={addEventListener:(name,fn)=>handlers[name]=fn};
  globalThis.matchMedia=()=>({matches:true});globalThis.requestAnimationFrame=()=>{};
  let source=await readFile(new URL('../dist/game.mjs',import.meta.url),'utf8');
- source=source.replace("from'./engine.mjs'",`from '${new URL('../dist/engine.mjs',import.meta.url).href}'`)+ '\nexport {g,input,playing};';
+ source=source.replace("from'./pixel-renderer.mjs'",`from '${new URL('../dist/pixel-renderer.mjs',import.meta.url).href}'`).replace("from'./engine.mjs'",`from '${new URL('../dist/engine.mjs',import.meta.url).href}'`)+ '\nexport {g,input,playing};';
  let game=await import('data:text/javascript;base64,'+Buffer.from(source).toString('base64'));
  const event=key=>({key,repeat:false,target:{tagName:'BODY'},preventDefault(){}});
  assert.equal(game.playing,false);
