@@ -1,0 +1,10 @@
+# Mew’s Garden
+A gentle, side-scrolling precision platformer. Help ginger cat Mew reach Jenn, dodge garden objects and a playful black-and-white cat, and collect optional yarn. Every mishap returns Mew safely to a cosy checkpoint.
+
+## Play locally
+Run `python3 -m http.server 4173 --directory dist` from this directory, then open http://localhost:4173. No build or dependencies are required. Use a local server because the game uses JavaScript modules.
+
+Move: arrows or A/D. Jump: Space or Z (hold for height). Dash: X or Shift, with arrows for direction; landing recharges it. R: checkpoint. Escape: pause. Touch buttons are available on touch devices. Sound is optional and off initially.
+
+## Verify
+Node 22+: `npm test`. Simulation tests cover movement, dash refill, safe returns, obstacles, patrol bounds, collectibles, pause, replay and completion.

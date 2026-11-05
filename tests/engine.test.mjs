@@ -1,0 +1,12 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {createGame,step,reset,returnToCheckpoint} from '../dist/engine.mjs';
+const tick=(g,input={},n=1)=>{for(let i=0;i<n;i++)step(g,input,1/120);};
+test('Mew lands, runs, jumps and lands again',()=>{let g=createGame();tick(g,{},30);assert.ok(g.player.grounded);let x=g.player.x;tick(g,{right:true},30);assert.ok(g.player.x>x+30);tick(g,{jump:true});assert.ok(g.player.vy<0);tick(g,{},150);assert.ok(g.player.grounded);});
+test('air dash is limited and landing restores it',()=>{let g=createGame();tick(g,{},30);tick(g,{jump:true},8);tick(g,{dash:true,right:true});assert.equal(g.player.dashReady,false);tick(g,{},1);let t=g.player.dashTimer;tick(g,{dash:true});assert.ok(g.player.dashTimer<t);tick(g,{},200);assert.equal(g.player.dashReady,true);});
+test('safe return preserves yarn and clears motion',()=>{let g=createGame();g.collected.add(0);g.checkpoint=1;g.player.vx=400;returnToCheckpoint(g);assert.equal(g.player.x,g.checkpoints[1].x);assert.equal(g.player.vx,0);assert.equal(g.collected.size,1);});
+test('pause freezes simulation and replay clears progress',()=>{let g=createGame();g.paused=true;tick(g,{right:true},30);assert.equal(g.player.x,80);g.collected.add(1);g.checkpoint=2;reset(g);assert.equal(g.checkpoint,0);assert.equal(g.collected.size,0);assert.equal(g.paused,false);});
+test('obstacles and cat return Mew safely',()=>{for(let type of ['obstacle','cat']){let g=createGame();let o=type==='cat'?g.cats[0]:g.obstacles[0];g.player.x=o.x;g.player.y=o.y;tick(g);assert.equal(g.returns,1);assert.equal(g.player.x,80);}});
+test('yarn collects once and reaching Jenn completes adventure',()=>{let g=createGame();g.player.x=g.yarns[0].x;g.player.y=g.yarns[0].y;tick(g);assert.equal(g.collected.size,1);g.player.x=g.goal.x;g.player.y=g.goal.y;tick(g);assert.equal(g.won,true);});
+test('cat patrol stays bounded',()=>{let g=createGame();for(let i=0;i<2000;i++){tick(g);for(let c of g.cats)assert.ok(c.x>=c.min&&c.x<=c.max);}});
+test('every route gap is traversable and every step rise is within jump reach',()=>{let g=createGame();for(let i=1;i<g.platforms.length;i++){let a=g.platforms[i-1],b=g.platforms[i];assert.ok(b.x-(a.x+a.w)<=180);assert.ok(a.y-b.y<=85);}});
