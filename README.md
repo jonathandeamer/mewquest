@@ -10,6 +10,3 @@ Move: arrows or A/D. Jump: C (hold for height). Dash: X or Shift, with arrows fo
 Node 22+: `npm test`. Simulation tests cover movement, dash refill, safe returns, obstacles, patrol bounds, collectibles, pause, replay and completion.
 
 The opening title screen uses pixel art based on the latest WhatsApp portrait (5 November 2026, 13:30). Press Enter or tap “press enter” to start directly.
-
-## 8-bit presentation
-Original sprites and tile scenery render on a 320×180 canvas with crisp nearest-neighbour scaling. The 18-colour palette, bitmap UI font, square-wave sound effects and block borders take inspiration from NES-era platform games. Physics and collision geometry remain independent of the renderer. Press Start 2P is bundled under the SIL Open Font License (see `dist/assets/FONT-LICENSE.txt`).
