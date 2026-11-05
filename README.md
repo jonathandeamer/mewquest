@@ -1,5 +1,5 @@
 # Mew Quest
-A gentle, side-scrolling precision platformer. Help ginger cat Mew reach Jenn, dodge garden objects and a playful black-and-white cat, and collect optional yarn. Every mishap returns Mew safely to a cosy checkpoint.
+A gentle, side-scrolling precision platformer. Help ginger cat Mew reach Jenn, dodge garden objects and a playful black-and-white cat, and collect optional Dreamies (little brown rectangular cat treats). Every mishap returns Mew safely to a cosy checkpoint.
 
 ## Play locally
 Run `python3 -m http.server 4173 --directory dist` from this directory, then open http://localhost:4173. No build or dependencies are required. Use a local server because the game uses JavaScript modules.
