@@ -7,9 +7,10 @@ test('Enter starts from the title screen, C jumps, and Space no longer jumps',as
  function el(selector){if(!elements.has(selector))elements.set(selector,{hidden:false,textContent:'',innerHTML:'',style:{},dataset:{},classList:{add(){},remove(){}},focus(){},getContext(){return {};},addEventListener(){}});return elements.get(selector);}
  globalThis.document={querySelector:el,querySelectorAll:()=>[],addEventListener(){},hidden:false};
  globalThis.window={addEventListener:(name,fn)=>handlers[name]=fn};
+ globalThis.Image=class{complete=false;naturalWidth=0;naturalHeight=0;};
  globalThis.matchMedia=()=>({matches:true});globalThis.requestAnimationFrame=()=>{};
  let source=await readFile(new URL('../dist/game.mjs',import.meta.url),'utf8');
- source=source.replace("from'./engine.mjs'",`from '${new URL('../dist/engine.mjs',import.meta.url).href}'`)+ '\nexport {g,input,playing};';
+ source=source.replace("from'./jenn-sprite.mjs'",`from '${new URL('../dist/jenn-sprite.mjs',import.meta.url).href}'`).replace("from'./engine.mjs'",`from '${new URL('../dist/engine.mjs',import.meta.url).href}'`)+ '\nexport {g,input,playing};';
  let game=await import('data:text/javascript;base64,'+Buffer.from(source).toString('base64'));
  const event=key=>({key,repeat:false,target:{tagName:'BODY'},preventDefault(){}});
  assert.equal(game.playing,false);

@@ -1,0 +1,4 @@
+Preview proposal created with the built-in imagegen tool.
+Reference: latest WhatsApp download, WhatsApp Image 2026-11-05 at 13.44.36.jpeg.
+Prompt: Create a soft illustrated character design sheet for Jenn based on the reference portrait. Preserve her friendly face, light skin, brown hair adapted into the established low ponytail, dusty pink knitted beanie without lettering, and deep teal coat. Show a welcoming crouched full-body pose reaching toward Mew, a face detail, and a garden cottage doorstep mockup with ginger Mew. Use warm muted garden colours and clean readable shapes; no pixel art. Labels: JENN; A familiar face at the end of the garden; Welcoming pose; Pink beanie · brown ponytail · teal coat; At Jenn’s doorstep.
+Game files and deployment unchanged: proposal for review only.

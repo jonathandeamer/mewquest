@@ -1,6 +1,8 @@
+import{drawJennSprite}from'./jenn-sprite.mjs';
 import{createGame,step,reset,returnToCheckpoint,W,H}from'./engine.mjs';
 const canvas=document.querySelector('#game'),ctx=canvas.getContext('2d'),$=s=>document.querySelector(s),g=createGame(),input={};let playing=false,camera=0,last=0,acc=0,sound=false,audio;
 const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const jennImage=new Image();jennImage.src='assets/jenn-welcome.png';
 function tone(freq=520){if(!sound)return;try{audio??=new(window.AudioContext||window.webkitAudioContext)();let o=audio.createOscillator(),v=audio.createGain();o.type='sine';o.frequency.value=freq;v.gain.setValueAtTime(.035,audio.currentTime);v.gain.exponentialRampToValueAtTime(.001,audio.currentTime+.15);o.connect(v);v.connect(audio.destination);o.start();o.stop(audio.currentTime+.15);}catch{}}
 function clearInput(){for(let k in input)input[k]=false;g.lastJump=false;g.lastDash=false;}
 function showMenu(kind){$('#overlay').classList.remove('hidden');let paused=kind==='pause',won=kind==='won';$('#menu-eyebrow').textContent=won?'THE BEST PLACE TO LAND.':paused?'A LITTLE BREATHER.':'WHISKERS UP. ADVENTURE AWAITS.';$('#menu-title').innerHTML=won?'Home, at last.<br><em>Hello, Jenn.</em>':paused?'Take a moment.<br><em>Stretch your paws.</em>':'Small paws.<br><em>Big adventure.</em>';$('#menu-copy').innerHTML=won?`One happy cat. One happy human.<br>${g.collected.size} of 12 yarn balls found along the way.`:paused?'Your cosy checkpoint is right where you left it.':'Help Mew find her way through the garden<br>and back to her favourite person.';$('#start').innerHTML=won?'Play again <span>↻</span>':paused?'Keep exploring <span>→</span>':'Let’s find Jenn <span>→</span>';}
@@ -23,7 +25,8 @@ function backdrop(){let sky=ctx.createLinearGradient(0,0,0,540);sky.addColorStop
  if(!reduced)for(let i=0;i<5;i++){let x=(i*217+g.time*13)%1050-40,y=155+Math.sin(g.time*.7+i)*55;ellipse(x,y,3,2,'#f8f7da');}
 }
 function jenn(){let x=5210,y=420;rect(5070,190,270,235,'#e4cfa6',3);rect(5090,225,90,125,'#f2dfb8',4);rect(5100,238,70,90,'#90aa99',4);rect(5131,238,6,90,'#f1e7c9');rect(5100,280,70,5,'#f1e7c9');rect(5210,250,85,175,'#8a9a76',4);rect(5220,264,65,160,'#a9b28c',3);ellipse(5270,340,4,4,'#e8d39a');ctx.fillStyle='#b38063';ctx.beginPath();ctx.moveTo(5045,205);ctx.lineTo(5205,125);ctx.lineTo(5360,205);ctx.fill();rect(5050,204,300,12,'#aa785b');rect(5160,420,170,12,'#c2b091',3);
- // Jenn: pale skin, brown hair and a visible ponytail.
+ if(drawJennSprite(ctx,jennImage,x,y)){text('Jenn',x-13,y-170,14,'#687650');return;}
+ // A simple fallback remains visible while the illustrated sprite loads.
  ellipse(x+13,y-91,15,23,'#77513a');ellipse(x+23,y-84,9,19,'#77513a');rect(x-8,y-37,8,33,'#526858',3);rect(x+6,y-37,8,33,'#526858',3);rect(x-11,y-8,12,7,'#654f3b',3);rect(x+5,y-8,13,7,'#654f3b',3);rect(x-15,y-72,32,39,'#c18774',10);line([[x-12,y-62],[x-27,y-45],[x-35,y-57]],'#f1d3ba',7);line([[x+14,y-61],[x+25,y-47]],'#f1d3ba',7);rect(x-4,y-82,12,13,'#f1d3ba',4);ellipse(x+1,y-93,12,15,'#f6dbc2');ellipse(x,y-105,13,8,'#77513a');line([[x-10,y-102],[x-11,y-91]],'#77513a',5);ellipse(x-3,y-94,1,1.5,'#514a3c');line([[x-2,y-87],[x+3,y-86],[x+6,y-89]],'#a96e60',1);text('Jenn',x-13,y-127,14,'#687650');
 }
 function draw(){ctx.clearRect(0,0,W,H);backdrop();ctx.save();ctx.translate(-camera,0);
