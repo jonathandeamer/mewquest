@@ -1,5 +1,5 @@
 # Mew Quest
-A gentle, side-scrolling precision platformer. Help ginger cat Mew reach Jenn, dodge garden objects and a playful black-and-white cat, and collect optional Dreamies (little brown rectangular cat treats). Every mishap returns Mew safely to a cosy checkpoint.
+A gentle, side-scrolling precision platformer. Help ginger cat Mew reach Jenn, jump over moving Coco, greet stationary Rosie, Ernie, Darwin and Minka on raised garden ledges, and collect optional Dreamies (little brown rectangular cat treats). Every mishap returns Mew safely to a cosy checkpoint.
 
 ## Play locally
 Run `python3 -m http.server 4173 --directory dist` from this directory, then open http://localhost:4173. No build or dependencies are required. Use a local server because the game uses JavaScript modules.
@@ -18,3 +18,8 @@ Jenn’s doorstep character uses `dist/assets/jenn-welcome.png`, a transparent i
 
 Ernie, a larger friendly ginger tom with a blue collar, waits on the platform near the midpoint and greets Mew with “ Hello Mew!” in a speech bubble. He is scenery, not a collision obstacle.
 Mew replies “hi ernie” in her own speech bubble when she passes him. Her reply follows her for four seconds of active play, appears once per playthrough, and clears on a checkpoint return.
+
+## Garden friends and Samuel
+Mew must land beside all four friendly cats before reaching the family. Rosie has white toes; Ernie is the larger ginger tom; Darwin is a brown tabby; Minka is mostly white with distinct black patches. Darwin and Minka sit together and Mew says “hi minka and darwin”. Friendly cats stay still. Coco is a mostly-black tuxedo cat who patrols and must be jumped over; no greeting is required for Coco. Garden ribbon gates and the FRIENDS counter identify the required encounters. Greetings survive safe checkpoint returns and reset with a new game.
+
+Dreamies are light-brown rectangles. Samuel stands beside Jenn with blonde hair, brown eyes and a green Minecraft Creeper-motif T-shirt. Mew says “hi samuel” for 2.6 seconds before the final popup, which retains only the exact requested reunion sentence.

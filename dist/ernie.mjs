@@ -17,11 +17,11 @@ export function drawErnie(ctx,drawCat){
  ctx.restore();
 }
 
-export function drawMewGreeting(ctx,player){
- const x=player.x-132,y=player.y-48;
+export function drawMewGreeting(ctx,player,message='hi ernie'){
+ const width=Math.max(120,message.length*8+34),x=player.x-width-12,y=Math.max(8,player.y-48);
  ctx.save();ctx.fillStyle='#fffbed';ctx.strokeStyle='#a4b18c';ctx.lineWidth=1.5;
- ctx.beginPath();ctx.roundRect(x,y,120,32,10);ctx.fill();ctx.stroke();
- ctx.beginPath();ctx.moveTo(x+99,y+31);ctx.lineTo(player.x+10,player.y-6);ctx.lineTo(x+111,y+31);ctx.closePath();ctx.fill();
- ctx.beginPath();ctx.moveTo(x+99,y+32);ctx.lineTo(player.x+10,player.y-6);ctx.lineTo(x+111,y+32);ctx.stroke();
- ctx.fillStyle='#46543e';ctx.font='17px Georgia';ctx.fillText('hi ernie',x+30,y+22);ctx.restore();
+ ctx.beginPath();ctx.roundRect(x,y,width,32,10);ctx.fill();ctx.stroke();
+ ctx.beginPath();ctx.moveTo(x+width-21,y+31);ctx.lineTo(player.x+10,player.y-6);ctx.lineTo(x+width-9,y+31);ctx.closePath();ctx.fill();
+ ctx.beginPath();ctx.moveTo(x+width-21,y+32);ctx.lineTo(player.x+10,player.y-6);ctx.lineTo(x+width-9,y+32);ctx.stroke();
+ ctx.fillStyle='#46543e';ctx.font='17px Georgia';ctx.fillText(message,x+18,y+22);ctx.restore();
 }
