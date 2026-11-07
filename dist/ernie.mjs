@@ -19,10 +19,13 @@ export function drawErnie(ctx,drawCat,viewport){
 }
 
 export function drawMewGreeting(ctx,player,message='Hi Ernie',viewport){
- const width=Math.min(Math.max(120,message.length*8+34),viewport?viewport.width-16:Infinity),x=viewport?Math.max(viewport.left+8,Math.min(player.x-width-12,viewport.left+viewport.width-width-8)):player.x-width-12,y=Math.max(8,player.y-48);
- ctx.save();ctx.fillStyle='#fffbed';ctx.strokeStyle='#a4b18c';ctx.lineWidth=1.5;
- ctx.beginPath();ctx.roundRect(x,y,width,32,10);ctx.fill();ctx.stroke();
- ctx.beginPath();ctx.moveTo(x+width-21,y+31);ctx.lineTo(player.x+10,player.y-6);ctx.lineTo(x+width-9,y+31);ctx.closePath();ctx.fill();
- ctx.beginPath();ctx.moveTo(x+width-21,y+32);ctx.lineTo(player.x+10,player.y-6);ctx.lineTo(x+width-9,y+32);ctx.stroke();
- ctx.fillStyle='#46543e';ctx.font='17px Georgia';ctx.fillText(message,x+18,y+22);ctx.restore();
+ ctx.save();ctx.font='17px Georgia';
+ const width=Math.min(360,Math.max(120,message.length*8+34),viewport?viewport.width-16:Infinity),lines=[];
+ let line='';for(const word of message.split(' ')){const candidate=line?line+' '+word:word,measured=ctx.measureText?.(candidate)?.width??candidate.length*8;if(line&&measured>width-36){lines.push(line);line=word;}else line=candidate;}if(line)lines.push(line);
+ const height=lines.length*22+12,x=viewport?Math.max(viewport.left+8,Math.min(player.x-width-12,viewport.left+viewport.width-width-8)):player.x-width-12,y=Math.max(8,player.y-height-16);
+ ctx.fillStyle='#fffbed';ctx.strokeStyle='#a4b18c';ctx.lineWidth=1.5;
+ ctx.beginPath();ctx.roundRect(x,y,width,height,10);ctx.fill();ctx.stroke();
+ ctx.beginPath();ctx.moveTo(x+width-21,y+height-1);ctx.lineTo(player.x+10,player.y-6);ctx.lineTo(x+width-9,y+height-1);ctx.closePath();ctx.fill();
+ ctx.beginPath();ctx.moveTo(x+width-21,y+height);ctx.lineTo(player.x+10,player.y-6);ctx.lineTo(x+width-9,y+height);ctx.stroke();
+ ctx.fillStyle='#46543e';lines.forEach((text,i)=>ctx.fillText(text,x+18,y+23+i*22));ctx.restore();
 }

@@ -27,3 +27,5 @@ Node 22+: `npm test`. Tests cover movement, one-way platforms, reachable ledges,
 Each newly collected Dreamie creates a golden star pop at its position. Stars gently rise and fade for 0.75 seconds, pause with gameplay, clear on resting/replay, and remain still when reduced motion is preferred.
 
 Mark’s current sprite was edited with the built-in imagegen tool: preserve his identity, outfit, bass and illustrated style, with broader shoulders, fuller torso and sturdier arms/legs rather than a skinny frame.
+
+At the doorstep Mew says “Hi Samuel! Hi Jenn, It's good to be home!” in a wrapping speech bubble for 4.5 seconds before the ending popup.
