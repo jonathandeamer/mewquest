@@ -58,10 +58,11 @@ function draw(){ctx.clearRect(0,0,viewWidth,H);backdrop();ctx.save();ctx.transla
 function drawGardenInstructions(){
  const width=Math.min(330,viewWidth-28),x=14,y=178;
  rect(x+width*.16,y+125,8,85,'#ae9770',3);rect(x+width*.78,y+125,8,85,'#ae9770',3);
- rect(x,y,width,146,'#fcf6e4',12);ctx.strokeStyle='#b2bb8c';ctx.lineWidth=2;ctx.stroke();
+ rect(x,y,width,164,'#fcf6e4',12);ctx.strokeStyle='#b2bb8c';ctx.lineWidth=2;ctx.stroke();
  text('Mew Quest',x+18,y+32,27,'#617648');text('A Little Garden Adventure',x+18,y+53,12,'#8b9672');
  text('← →  Move',x+18,y+79,14,'#5f6c4d');text('C  Jump',x+width*.54,y+79,14,'#5f6c4d');
  text('X  Dash',x+18,y+102,14,'#5f6c4d');text('R  Rest',x+width*.54,y+102,14,'#5f6c4d');
- text('Meet Your Friends. Jump Over Coco.',x+18,y+128,Math.min(12,(width-36)/18),'#8b7652');
+ text('Meet your friends.',x+18,y+127,13,'#8b7652');
+ text('Jump over plant pots and Coco!',x+18,y+146,Math.min(12,(width-36)/15),'#8b7652');
 }
 function frame(t){let dt=Math.min((t-last)/1000,.05);last=t;acc+=dt;if(playing&&!g.paused&&!g.won){while(acc>=1/120){let before=g.collected.size,jump=g.player.vy;step(g,input,1/120);if(g.collected.size>before)tone(740);if(g.player.vy< -400&&jump>=0)tone(430);acc-=1/120;}if(g.won){clearInput();showMenu('won');tone(880);}}else acc=0;let target=followCamera(g.player.x,viewWidth);camera+=(target-camera)*(reduced?1:Math.min(1,dt*6));draw();requestAnimationFrame(frame);}canvas.focus();requestAnimationFrame(frame);
