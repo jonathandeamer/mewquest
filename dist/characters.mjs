@@ -4,11 +4,11 @@ function box(ctx,x,y,w,h,color,r=0){ctx.fillStyle=color;ctx.beginPath();ctx.roun
 function oval(ctx,x,y,rx,ry,color){ctx.fillStyle=color;ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fill();}
 function label(ctx,s,x,y,size=13){ctx.fillStyle='#546149';ctx.font=`${size}px Georgia`;ctx.fillText(s,x,y);}
 function greeting(ctx,x,y,greeted){box(ctx,x-42,y-101,126,30,greeted?'#f0f3df':'#fffbed',10);label(ctx,greeted?'Lovely to see you!':'Hello Mew!',x-28,y-81,13);ctx.fillStyle=greeted?'#f0f3df':'#fffbed';ctx.beginPath();ctx.moveTo(x,y-72);ctx.lineTo(x+10,y-61);ctx.lineTo(x+15,y-72);ctx.fill();}
-export function drawFriends(ctx,cat,g){
+export function drawFriends(ctx,cat,g,viewport){
  const rosie=ENCOUNTERS[0],pair=ENCOUNTERS[2];
  cat(rosie.x,rosie.groundY-30,-1,true,1,0,{fur:'#a58c77',light:'#f6ebd9',stripe:'#67534a',whiteToes:true});
  label(ctx,'Rosie',rosie.x-5,rosie.groundY+22);greeting(ctx,rosie.x,rosie.groundY,g.greetedCats.has('rosie'));
- drawErnie(ctx,cat);
+ drawErnie(ctx,cat,viewport);
  cat(pair.x-42,pair.groundY-30,-1,true,1,0,{fur:'#926443',light:'#dcb68a',stripe:'#543b2a'});
  cat(pair.x+30,pair.groundY-30,-1,false,1,0,{fur:'#222b31',light:'#f7efe5',patch:'#303a43',collar:'#b17b9e',whiteMuzzle:true});
  label(ctx,'Darwin',pair.x-48,pair.groundY+22);label(ctx,'Minka',pair.x+27,pair.groundY+22);
@@ -19,12 +19,13 @@ export function drawGreetingGates(ctx,g){
   // A visible garden ribbon marks the full-height stop; no hidden leap-through route.
   ctx.save();ctx.strokeStyle='#9baa7a';ctx.lineWidth=2;ctx.setLineDash([5,9]);ctx.beginPath();ctx.moveTo(e.gateX,0);ctx.lineTo(e.gateX,e.gateGround);ctx.stroke();ctx.setLineDash([]);
   box(ctx,e.gateX-5,e.gateGround-78,10,78,'#9b9b70',3);
-  box(ctx,e.gateX+20,e.gateGround-55,194,35,'#fbf7e7',6);label(ctx,`Say hello to ${e.name}`,e.gateX+32,e.gateGround-33,12);
+
   ctx.restore();
  }
 }
-export function drawSamuel(ctx){
+export function drawSamuel(ctx,image){
  const {x,groundY:y}=SAMUEL;ctx.save();
+ if(drawIllustratedPerson(ctx,image,x,y,125)){label(ctx,'Samuel',x-21,y-138);ctx.restore();return;}
  // Brown trainers and blue jeans, with a small child-sized silhouette.
  box(ctx,x-12,y-39,10,33,'#627e97',4);box(ctx,x+3,y-39,10,33,'#627e97',4);
  box(ctx,x-15,y-8,15,8,'#775741',3);box(ctx,x+2,y-8,16,8,'#775741',3);
@@ -39,8 +40,9 @@ export function drawSamuel(ctx){
  label(ctx,'Samuel',x-21,y-135);ctx.restore();
 }
 
-export function drawMark(ctx){
+export function drawMark(ctx,image){
  const {x,groundY:y}=MARK;ctx.save();
+ if(drawIllustratedPerson(ctx,image,x,y,175)){label(ctx,'Mark',x-14,y-187);ctx.restore();return;}
  box(ctx,x-16,y-57,12,49,'#536371',4);box(ctx,x+4,y-57,12,49,'#536371',4);
  box(ctx,x-20,y-9,19,9,'#5f4938',3);box(ctx,x+2,y-9,20,9,'#5f4938',3);
  box(ctx,x-21,y-113,43,59,'#a96d57',7);box(ctx,x-30,y-108,12,46,'#a96d57',5);box(ctx,x+20,y-108,12,44,'#a96d57',5);
@@ -68,7 +70,13 @@ export function drawCheckpoints(ctx,g,reduced=false){
   box(ctx,c.x+33,ground-91,5,80,active?'#98753f':'#929774',2);
   box(ctx,c.x+38,ground-91,52,31,active?'#e4b747':'#abc18a',3);box(ctx,c.x+42,ground-87,44,3,active?'#f4d67f':'#d2dfb8',1);
   ctx.fillStyle=active?'#63512f':'#f9f8e9';ctx.font='bold 18px Georgia';ctx.fillText(active?'✓':'⚑',c.x+54,ground-68);
-  box(ctx,c.x-44,ground-123,130,25,'#fcfaed',5);label(ctx,active?'CHECKPOINT ✓':'CHECKPOINT',c.x-35,ground-106,11);
-  if(i===g.checkpoint&&!reduced){let rise=Math.sin(g.time*3)*3;label(ctx,'▼',c.x+3,ground-137+rise,16);}
+
+  if(i===g.checkpoint&&!reduced){let rise=Math.sin(g.time*3)*3;label(ctx,'▼',c.x+3,ground-110+rise,16);}
  }
+}
+
+export function drawIllustratedPerson(ctx,image,x,groundY,height){
+ if(!image?.complete||!image.naturalWidth||!image.naturalHeight)return false;
+ const width=height*image.naturalWidth/image.naturalHeight;
+ ctx.drawImage(image,x-width*.52,groundY-height,width,height);return true;
 }

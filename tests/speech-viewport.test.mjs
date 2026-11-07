@@ -1,0 +1,3 @@
+import{test}from'node:test';import assert from'node:assert/strict';import{drawMewGreeting}from'../dist/ernie.mjs';
+test('Mew’s greeting stays inside a portrait viewport',()=>{let boxes=[];let ctx=new Proxy({roundRect(x,y,w,h){boxes.push({x,y,w,h});}},{get(t,k){return k in t?t[k]:()=>{};}});drawMewGreeting(ctx,{x:1490,y:302},'Hi Minka And Darwin',{left:1400,width:250});assert.ok(boxes[0].x>=1408);assert.ok(boxes[0].x+boxes[0].w<=1642);});
+test('Ernie’s speech does not appear before his part of the garden',async()=>{let{drawErnie}=await import('../dist/ernie.mjs');let texts=[];let ctx=new Proxy({fillText(t){texts.push(t);}},{get(t,k){return k in t?t[k]:()=>{};}});drawErnie(ctx,()=>{},{left:0,width:960});assert.equal(texts.length,0);});

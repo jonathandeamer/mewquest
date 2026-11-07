@@ -31,5 +31,5 @@ export function step(g,input={},dt=1/120){if(g.paused||g.won)return;dt=Math.min(
  for(let i=0;i<g.checkpoints.length;i++){let c=g.checkpoints[i];if(i>g.checkpoint&&(!c.requires||g.greetedCats.has(c.requires))&&Math.abs(p.x-c.x)<42&&Math.abs(p.y-c.y)<42){g.checkpoint=i;g.notice=1.5;}}
  for(let y of g.treats)if(Math.hypot(p.x+15-y.x,p.y+14-y.y)<30)g.collected.add(y.id);
  updateGreetings(g,dt);
- if(overlaps(p,g.goal)&&p.grounded&&missingFriends(g).length===0){g.samuelGreeted=true;g.mewGreetingText='hi samuel';g.mewGreetingTime=2.6;g.reunionRemaining=2.6;p.vx=0;p.vy=0;}
+ if(overlaps(p,g.goal)&&p.grounded&&missingFriends(g).length===0){g.samuelGreeted=true;g.mewGreetingText='Hi Samuel';g.mewGreetingTime=2.6;g.reunionRemaining=2.6;p.vx=0;p.vy=0;}
 }

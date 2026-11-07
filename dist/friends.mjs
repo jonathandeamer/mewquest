@@ -1,8 +1,8 @@
 import{ERNIE}from'./ernie.mjs';
 export const ENCOUNTERS=[
- {id:'rosie',ids:['rosie'],name:'Rosie',x:1535,groundY:330,gateX:1720,gateGround:440,reply:'hi rosie'},
- {id:'ernie',ids:['ernie'],name:'Ernie & Mark',x:ERNIE.x,groundY:ERNIE.groundY,gateX:2665,gateGround:300,reply:'hi ernie'},
- {id:'pair',ids:['darwin','minka'],name:'Darwin & Minka',x:3970,groundY:230,gateX:4160,gateGround:295,reply:'hi minka and darwin'}
+ {id:'rosie',ids:['rosie'],name:'Rosie',x:1535,groundY:330,gateX:1720,gateGround:440,reply:'Hi Rosie'},
+ {id:'ernie',ids:['ernie'],name:'Ernie & Mark',x:ERNIE.x,groundY:ERNIE.groundY,gateX:2665,gateGround:300,reply:'Hi Ernie'},
+ {id:'pair',ids:['darwin','minka'],name:'Darwin & Minka',x:3970,groundY:230,gateX:4160,gateGround:295,reply:'Hi Minka And Darwin'}
 ];
 export const MARK={x:2560,groundY:300};
 export const SAMUEL={x:5280,groundY:420};
@@ -21,5 +21,5 @@ export function updateGreetings(g,dt){
    if(stop.id==='ernie')g.ernieGreeted=true;
   }
  }
- if(g.greetedCats.has('ernie')&&!g.markGreeted&&p.grounded&&Math.abs(p.x+15-MARK.x)<85&&Math.abs(p.y+p.h-MARK.groundY)<4)queueReply(g,'hi mark','mark');
+ if(g.greetedCats.has('ernie')&&!g.markGreeted&&p.grounded&&Math.abs(p.x+15-MARK.x)<85&&Math.abs(p.y+p.h-MARK.groundY)<4)queueReply(g,'Hi Mark','mark');
 }
