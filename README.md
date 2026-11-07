@@ -29,3 +29,6 @@ Each newly collected Dreamie creates a golden star pop at its position. Stars ge
 Mark’s current sprite was edited with the built-in imagegen tool: preserve his identity, outfit, bass and illustrated style, with broader shoulders, fuller torso and sturdier arms/legs rather than a skinny frame.
 
 At the doorstep Mew says “Hi Samuel! Hi Jenn, It's good to be home!” in a wrapping speech bubble for 4.5 seconds before the ending popup.
+
+## Phones and laptops
+Use the same hosted game URL on both. Phones have large arrow buttons, labelled Jump and Dash buttons, and a safe Rest button. Hold a movement arrow with one thumb and Jump/Dash with the other. Multiple fingers are tracked independently; pause/focus loss clears held controls. Controls respect phone safe areas and remain visible on narrow or hybrid-touch screens. Landscape provides a wider view; portrait remains supported, with the camera showing more path ahead. Laptop controls remain arrows/A-D, C jump, X/Shift dash, R rest and Escape pause. Sound starts only after selecting Sound On. This is a browser game, not a store-installed app.

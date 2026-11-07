@@ -1,3 +1,4 @@
+import{bindTouchControls}from'./touch-controls.mjs';
 import{drawPickupStars}from'./pickup-stars.mjs';
 import{gameViewport,followCamera}from'./viewport.mjs';
 import{drawMewGreeting}from'./ernie.mjs';
@@ -6,24 +7,26 @@ import{missingCats,missingFriends,FRIEND_NAMES}from'./friends.mjs';
 import{syncMusic}from'./music.mjs';
 import{drawJennSprite}from'./jenn-sprite.mjs';
 import{createGame,step,reset,returnToCheckpoint,W,H}from'./engine.mjs';
-const canvas=document.querySelector('#game'),ctx=canvas.getContext('2d'),$=s=>document.querySelector(s),g=createGame(),input={};let playing=true,camera=0,last=0,acc=0,sound=false,audio,viewWidth=W;
+const canvas=document.querySelector('#game'),ctx=canvas.getContext('2d'),$=s=>document.querySelector(s),g=createGame(),input={};let playing=true,camera=0,last=0,acc=0,sound=false,audio,viewWidth=W,touchControls;
+let touchMode=matchMedia('(any-pointer: coarse)').matches||!!globalThis.navigator?.maxTouchPoints;
 const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const soundtrack=document.querySelector('#soundtrack');
 function updateMusic(){syncMusic(soundtrack,{enabled:sound,active:playing&&!g.paused&&!g.won&&!document.hidden});}
 const jennImage=new Image();jennImage.src='assets/jenn-welcome.png';
 const samuelImage=new Image();samuelImage.src='assets/samuel-illustrated.png';
 const markImage=new Image();markImage.src='assets/mark-stocky.png';
-function resizeGame(){const v=gameViewport(window.innerWidth||960,window.innerHeight||540);viewWidth=v.width;canvas.width=v.width;canvas.height=v.height;ctx.imageSmoothingEnabled=true;camera=followCamera(g.player.x,viewWidth);}
-window.addEventListener('resize',resizeGame);resizeGame();
+function resizeGame(){const bounds=canvas.getBoundingClientRect?.();const v=gameViewport(bounds?.width||window.innerWidth||960,bounds?.height||window.innerHeight||540);viewWidth=v.width;canvas.width=v.width;canvas.height=v.height;ctx.imageSmoothingEnabled=true;camera=followCamera(g.player.x,viewWidth);}
+window.addEventListener('resize',resizeGame);window.visualViewport?.addEventListener('resize',resizeGame);resizeGame();
 function tone(freq=520){if(!sound)return;try{audio??=new(window.AudioContext||window.webkitAudioContext)();let o=audio.createOscillator(),v=audio.createGain();o.type='sine';o.frequency.value=freq;v.gain.setValueAtTime(.035,audio.currentTime);v.gain.exponentialRampToValueAtTime(.001,audio.currentTime+.15);o.connect(v);v.connect(audio.destination);o.start();o.stop(audio.currentTime+.15);}catch{}}
-function clearInput(){for(let k in input)input[k]=false;g.lastJump=false;g.lastDash=false;}
+function clearInput(){touchControls?.clear();for(let k in input)input[k]=false;g.lastJump=false;g.lastDash=false;}
 function showMenu(kind){updateMusic();$('#overlay').classList.remove('hidden');let paused=kind==='pause',won=kind==='won';if(won)$('#overlay').classList.add('ending');else $('#overlay').classList.remove('ending');for(const id of ['#menu-eyebrow','#menu-title','#menu-foot','#start'])$(id).hidden=won;$('#menu-eyebrow').textContent=won?'THE BEST PLACE TO LAND.':paused?'A LITTLE BREATHER.':'WHISKERS UP. ADVENTURE AWAITS.';$('#menu-title').innerHTML=won?'Home, at last.<br><em>Hello, Jenn.</em>':paused?'Take a moment.<br><em>Stretch your paws.</em>':'Small paws.<br><em>Big adventure.</em>';$('#menu-copy').innerHTML=won?`Mew is reunited with Jenn and Samuel! Time to watch Coronation Street together on the sofa with some crisps and Dreamies :)<br><span class="reunion-count">Dreamies collected: ${g.collected.size} / ${g.treats.length}</span>`:paused?'Your cosy resting spot is right where you left it.':'Help Mew find her way through the garden<br>and back to her favourite person.';$('#start').innerHTML=won?'Play again <span>↻</span>':paused?'Keep exploring <span>→</span>':'Let’s find Jenn <span>→</span>';}
 $('#start').onclick=()=>{if(g.won){reset(g);camera=0;}playing=true;g.paused=false;clearInput();$('#overlay').classList.add('hidden');canvas.focus();tone();updateMusic();};
 function pause(){if(!playing||g.won)return;g.paused=!g.paused;clearInput();if(g.paused)showMenu('pause');else{$('#overlay').classList.add('hidden');canvas.focus();updateMusic();}}
+$('#rest').onclick=()=>{if(g.paused||g.won)return;clearInput();returnToCheckpoint(g);tone(300);canvas.focus();};
 $('#pause').onclick=pause;$('#sound').onclick=()=>{sound=!sound;$('#sound').textContent=sound?'Sound On':'Sound Off';$('#sound').setAttribute('aria-pressed',String(sound));tone();updateMusic();if(playing&&!g.paused&&!g.won)canvas.focus();};
 const mapping={ArrowLeft:'left',a:'left',A:'left',ArrowRight:'right',d:'right',D:'right',ArrowUp:'up',w:'up',W:'up',ArrowDown:'down',s:'down',S:'down',c:'jump',C:'jump',x:'dash',X:'dash',Shift:'dash'};
 window.addEventListener('keydown',e=>{if(e.target.tagName==='BUTTON')return;if(mapping[e.key]){e.preventDefault();input[mapping[e.key]]=true;}if(e.key==='Escape'&&!e.repeat)pause();if(e.key.toLowerCase()==='r'&&playing&&!g.paused&&!g.won){returnToCheckpoint(g);tone(300);}});window.addEventListener('keyup',e=>{if(mapping[e.key]){e.preventDefault();input[mapping[e.key]]=false;}});window.addEventListener('blur',()=>{clearInput();if(playing&&!g.paused&&!g.won){g.paused=true;showMenu('pause');}});document.addEventListener('visibilitychange',()=>{if(document.hidden){clearInput();if(playing&&!g.paused&&!g.won){g.paused=true;showMenu('pause');}}});
-for(let b of document.querySelectorAll('[data-key]')){b.addEventListener('pointerdown',e=>{e.preventDefault();b.setPointerCapture(e.pointerId);input[b.dataset.key]=true;});for(let ev of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(ev,e=>{e.preventDefault();input[b.dataset.key]=false;});}
+touchControls=bindTouchControls(document.querySelectorAll('[data-key]'),input,()=>{touchMode=true;});
 function rect(x,y,w,h,c,r=0){ctx.fillStyle=c;ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill();}function ellipse(x,y,rx,ry,c){ctx.fillStyle=c;ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fill();}function line(points,c,width=2){ctx.strokeStyle=c;ctx.lineWidth=width;ctx.lineCap='round';ctx.lineJoin='round';ctx.beginPath();points.forEach((p,i)=>i?ctx.lineTo(...p):ctx.moveTo(...p));ctx.stroke();}function text(s,x,y,size,c,font='Georgia'){ctx.font=`${size}px ${font}`;ctx.fillStyle=c;ctx.fillText(s,x,y);}
 function cat(x,y,face=1,ginger=true,scale=1,run=0,palette=null){ctx.save();ctx.translate(x+15,y+14);ctx.scale(face*scale,scale);let fur=palette?.fur||(ginger?'#d48945':'#394740'),light=palette?.light||(ginger?'#f5cc8a':'#fcf5df');line([[-11,5],[-23,0],[-27,-11],[-24,-17]],fur,7);ellipse(0,3,15,10,fur);let stride=Math.sin(run)*3;rect(-10,8+stride,6,8,fur,3);rect(7,8-stride,6,8,fur,3);ellipse(10,-6,11,10,fur);ctx.fillStyle=fur;ctx.beginPath();ctx.moveTo(1,-11);ctx.lineTo(1,-23);ctx.lineTo(10,-15);ctx.lineTo(17,-23);ctx.lineTo(21,-9);ctx.fill();ctx.fillStyle='#e8ac8d';ctx.beginPath();ctx.moveTo(3,-15);ctx.lineTo(3,-20);ctx.lineTo(7,-15);ctx.fill();ellipse(15,-2,6,5,light);ellipse(14,-8,1.5,2,'#344333');ellipse(21,-3,1.6,1.4,'#9b6153');if(!ginger)ellipse(-1,3,7,8,light);else{line([[-5,-4],[-7,2]],palette?.stripe||'#b36c37',2);line([[1,-5],[-1,1]],palette?.stripe||'#b36c37',2);line([[6,-14],[9,-12]],palette?.stripe||'#b36c37',2);}if(palette?.whiteToes){rect(-10,12,6,4,'#fffbed',2);rect(7,12,6,4,'#fffbed',2);}if(palette?.patch){ellipse(-2,0,9,7,palette.patch);ellipse(7,-14,5,6,palette.patch);line([[-14,4],[-23,0],[-26,-10]],palette.patch,6);}if(palette?.collar){line([[2,0],[16,1]],palette.collar,3);}line([[19,0],[27,-2]],'#776b56',.7);line([[19,2],[27,3]],'#776b56',.7);ctx.restore();}
 function flower(x,y,s=1,color='#e9bd9e'){line([[x,y],[x-2,y-17*s]],'#81965c',2);ellipse(x+4,y-8*s,5*s,2*s,'#8da565');for(let i=0;i<5;i++){let a=i*Math.PI*2/5;ellipse(x+Math.cos(a)*4*s-2,y-19*s+Math.sin(a)*4*s,3*s,3*s,color);}ellipse(x-2,y-19*s,2*s,2*s,'#c49c48');}
@@ -62,8 +65,7 @@ function drawGardenInstructions(){
  rect(x+width*.16,y+125,8,85,'#ae9770',3);rect(x+width*.78,y+125,8,85,'#ae9770',3);
  rect(x,y,width,164,'#fcf6e4',12);ctx.strokeStyle='#b2bb8c';ctx.lineWidth=2;ctx.stroke();
  text('Mew Quest',x+18,y+32,27,'#617648');text('A Little Garden Adventure',x+18,y+53,12,'#8b9672');
- text('← →  Move',x+18,y+79,14,'#5f6c4d');text('C  Jump',x+width*.54,y+79,14,'#5f6c4d');
- text('X  Dash',x+18,y+102,14,'#5f6c4d');text('R  Rest',x+width*.54,y+102,14,'#5f6c4d');
+ if(touchMode){text('Hold The Arrows To Move',x+18,y+79,14,'#5f6c4d');text('Tap Jump • Tap Dash',x+18,y+102,14,'#5f6c4d');}else{text('← →  Move',x+18,y+79,14,'#5f6c4d');text('C  Jump',x+width*.54,y+79,14,'#5f6c4d');text('X  Dash',x+18,y+102,14,'#5f6c4d');text('R  Rest',x+width*.54,y+102,14,'#5f6c4d');}
  text('Meet your friends.',x+18,y+127,13,'#8b7652');
  text('Jump over plant pots and Coco!',x+18,y+146,Math.min(12,(width-36)/15),'#8b7652');
 }
