@@ -1,0 +1,5 @@
+import{test}from'node:test';import assert from'node:assert/strict';import{createGame,step,reset,returnToCheckpoint}from'../dist/engine.mjs';
+const tick=(g,n=1)=>{for(let i=0;i<n;i++)step(g,{},1/120);};
+test('collecting a Dreamie creates one star at its position',()=>{let g=createGame(),t=g.treats[0];Object.assign(g.player,{x:t.x-15,y:t.y-14,vy:0});tick(g);assert.equal(g.pickupStars.length,1);assert.equal(g.pickupStars[0].x,t.x);assert.equal(g.pickupStars[0].y,t.y);tick(g,2);assert.equal(g.pickupStars.length,1);assert.equal(g.collected.size,1);});
+test('stars pause with gameplay and expire after a brief pop',()=>{let g=createGame(),t=g.treats[0];Object.assign(g.player,{x:t.x-15,y:t.y-14,vy:0});tick(g);g.paused=true;tick(g,200);assert.equal(g.pickupStars[0].age,0);g.paused=false;tick(g,110);assert.equal(g.pickupStars.length,0);});
+test('resting and replay clear decorative stars',()=>{let g=createGame();g.pickupStars.push({x:10,y:20,age:0});returnToCheckpoint(g);assert.equal(g.pickupStars.length,0);g.pickupStars.push({x:10,y:20,age:0});reset(g);assert.equal(g.pickupStars.length,0);});

@@ -1,3 +1,4 @@
+import{drawPickupStars}from'./pickup-stars.mjs';
 import{gameViewport,followCamera}from'./viewport.mjs';
 import{drawMewGreeting}from'./ernie.mjs';
 import{drawFriends,drawGreetingGates,drawSamuel,drawMark,drawCheckpoints}from'./characters.mjs';
@@ -11,7 +12,7 @@ const soundtrack=document.querySelector('#soundtrack');
 function updateMusic(){syncMusic(soundtrack,{enabled:sound,active:playing&&!g.paused&&!g.won&&!document.hidden});}
 const jennImage=new Image();jennImage.src='assets/jenn-welcome.png';
 const samuelImage=new Image();samuelImage.src='assets/samuel-illustrated.png';
-const markImage=new Image();markImage.src='assets/mark-illustrated.png';
+const markImage=new Image();markImage.src='assets/mark-stocky.png';
 function resizeGame(){const v=gameViewport(window.innerWidth||960,window.innerHeight||540);viewWidth=v.width;canvas.width=v.width;canvas.height=v.height;ctx.imageSmoothingEnabled=true;camera=followCamera(g.player.x,viewWidth);}
 window.addEventListener('resize',resizeGame);resizeGame();
 function tone(freq=520){if(!sound)return;try{audio??=new(window.AudioContext||window.webkitAudioContext)();let o=audio.createOscillator(),v=audio.createGain();o.type='sine';o.frequency.value=freq;v.gain.setValueAtTime(.035,audio.currentTime);v.gain.exponentialRampToValueAtTime(.001,audio.currentTime+.15);o.connect(v);v.connect(audio.destination);o.start();o.stop(audio.currentTime+.15);}catch{}}
@@ -47,6 +48,7 @@ function draw(){ctx.clearRect(0,0,viewWidth,H);backdrop();ctx.save();ctx.transla
  for(let treat of g.treats)if(!g.collected.has(treat.id)){let yy=treat.y+(reduced?0:Math.sin(g.time*2+treat.id)*3);rect(treat.x-9,yy-6,18,12,'#c49359',2);rect(treat.x-7,yy-5,14,3,'#e4c28e',1);rect(treat.x-7,yy+2,14,2,'#a57543',1);rect(treat.x-3,yy-1,2,2,'#d5ac75');rect(treat.x+3,yy,2,2,'#d5ac75');}
  drawFriends(ctx,cat,g,{left:camera,width:viewWidth});drawMark(ctx,markImage);drawGreetingGates(ctx,g);jenn();drawSamuel(ctx,samuelImage);for(let c of g.cats){cat(c.x,c.y,c.speed>0?1:-1,false,1,g.time*7,{fur:'#303b38',light:'#fffbed',whiteToes:true});text('Coco',c.x-20,c.y-26,12,'#66734f');}
  let p=g.player;if(p.dashTimer>0){for(let i=1;i<4;i++){ctx.globalAlpha=.16*(4-i);cat(p.x-p.face*i*13,p.y,p.face,true,1,0);}ctx.globalAlpha=1;}ellipse(p.x+14,p.y+29,19,4,'#5a6a3c20');cat(p.x,p.y,p.face,true,1,p.grounded&&Math.abs(p.vx)>20?g.time*19:0);
+ drawPickupStars(ctx,g.pickupStars,reduced);
  if(g.mewGreetingTime>0)drawMewGreeting(ctx,p,g.mewGreetingText,{left:camera,width:viewWidth});
  if(!playing){text('Mew',p.x-1,p.y-22,13,'#727d54');}
  if(g.won){text('♡',p.x+20,p.y-35,25,'#b77f70');text('♡',5224,282,21,'#b77f70');}

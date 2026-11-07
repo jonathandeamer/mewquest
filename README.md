@@ -14,7 +14,7 @@ Greetings are capitalised: Hi Rosie, Hi Ernie, Hi Minka And Darwin, Hi Mark and 
 Platforms are one-way: Mew jumps through from below and lands on top while falling. Rosie’s flag is beyond her raised ledge and activates after her greeting. Optional light-brown Dreamies are counted during play and in the larger ending popup naming Jenn and Samuel.
 
 ## Illustrated characters
-Jenn: `dist/assets/jenn-welcome.png`. Samuel: `dist/assets/samuel-illustrated.png`. Mark: `dist/assets/mark-illustrated.png`.
+Jenn: `dist/assets/jenn-welcome.png`. Samuel: `dist/assets/samuel-illustrated.png`. Mark: `dist/assets/mark-stocky.png`.
 
 Samuel and Mark were generated using the built-in imagegen tool with Jenn’s sprite as the illustration-style reference. Samuel prompt: full-body transparent illustration of a smiling blonde, brown-eyed little boy in a green Minecraft Creeper-motif shirt, jeans and trainers, matching Jenn’s warm storybook shading and clean silhouette. Mark prompt: full-body transparent friendly man in a rust-and-cream checked shirt, jeans and brown shoes, holding a wooden four-string bass, matching Jenn’s exact illustrated style. Both preserve their existing character requirements. Small drawn fallbacks remain while images load.
 
@@ -23,3 +23,7 @@ Samuel and Mark were generated using the built-in imagegen tool with Jenn’s sp
 
 ## Verification
 Node 22+: `npm test`. Tests cover movement, one-way platforms, reachable ledges, Coco, required and queued greetings, checkpoint/replay state, Samuel timing, exact ending/count, illustrated rendering/fallbacks, responsive viewport/camera, speech clipping and music playback state. Live browser visual checks require an available browser host.
+
+Each newly collected Dreamie creates a golden star pop at its position. Stars gently rise and fade for 0.75 seconds, pause with gameplay, clear on resting/replay, and remain still when reduced motion is preferred.
+
+Mark’s current sprite was edited with the built-in imagegen tool: preserve his identity, outfit, bass and illustrated style, with broader shoulders, fuller torso and sturdier arms/legs rather than a skinny frame.
