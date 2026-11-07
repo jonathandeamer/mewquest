@@ -24,8 +24,8 @@ test('Enter starts from the title screen, C jumps, and Space no longer jumps',as
  handlers.keyup(event('C'));
  handlers.keydown(event(' '));assert.equal(game.input.jump,false,'Space should not trigger jump');
  game.g.mewGreetingText='hi minka and darwin';game.g.mewGreetingTime=4;game.draw();
- game.showMenu('won');
- assert.equal(el('#menu-copy').innerHTML,'Mew is reunited with Jenn! Time to watch Coronation Street together on the sofa with some crisps and Dreamies :)');
+ game.g.collected.add(0);game.g.collected.add(1);game.showMenu('won');
+ assert.equal(el('#menu-copy').innerHTML,'Mew is reunited with Jenn and Samuel! Time to watch Coronation Street together on the sofa with some crisps and Dreamies :)<br><span class="reunion-count">Dreamies collected: 2 / 12</span>');
  for(const id of ['#menu-eyebrow','#menu-title','#menu-foot','#start'])assert.equal(el(id).hidden,true,`${id} must not appear in the ending popup`);
  game.showMenu('pause');
  for(const id of ['#menu-eyebrow','#menu-title','#menu-foot','#start'])assert.equal(el(id).hidden,false,`${id} must be restored for pause`);
