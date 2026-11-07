@@ -32,3 +32,5 @@ At the doorstep Mew says “Hi Samuel! Hi Jenn, It's good to be home!” in a wr
 
 ## Phones and laptops
 Use the same hosted game URL on both. Phones have large arrow buttons, labelled Jump and Dash buttons, and a safe Rest button. Hold a movement arrow with one thumb and Jump/Dash with the other. Multiple fingers are tracked independently; pause/focus loss clears held controls. Controls respect phone safe areas and remain visible on narrow or hybrid-touch screens. Landscape provides a wider view; portrait remains supported, with the camera showing more path ahead. Laptop controls remain arrows/A-D, C jump, X/Shift dash, R rest and Escape pause. Sound starts only after selecting Sound On. This is a browser game, not a store-installed app.
+
+Phones/tablets (and narrow windows) retain the Mew Quest splash with Mew’s portrait and a large Tap To Play button. Simulation stays stopped until tap or Enter. Desktop-size keyboard-only browsers start directly in the garden. The game remains public and uses the same URL on both.

@@ -8,7 +8,7 @@ test('the game starts immediately, fills the viewport, renders illustrations and
  globalThis.document={querySelector:el,querySelectorAll:()=>[],addEventListener(){},hidden:false};
  globalThis.window={addEventListener:(name,fn)=>handlers[name]=fn};
  globalThis.Image=class{complete=false;naturalWidth=0;naturalHeight=0;};
- globalThis.matchMedia=()=>({matches:true});globalThis.requestAnimationFrame=()=>{};
+ globalThis.matchMedia=query=>({matches:query.includes('reduced-motion')});globalThis.requestAnimationFrame=()=>{};
  let source=await readFile(new URL('../dist/game.mjs',import.meta.url),'utf8');
  source=source.replace("from'./touch-controls.mjs'",`from '${new URL('../dist/touch-controls.mjs',import.meta.url).href}'`).replace("from'./pickup-stars.mjs'",`from '${new URL('../dist/pickup-stars.mjs',import.meta.url).href}'`).replace("from'./viewport.mjs'",`from '${new URL('../dist/viewport.mjs',import.meta.url).href}'`).replace("from'./characters.mjs'",`from '${new URL('../dist/characters.mjs',import.meta.url).href}'`).replace("from'./friends.mjs'",`from '${new URL('../dist/friends.mjs',import.meta.url).href}'`).replace("from'./ernie.mjs'",`from '${new URL('../dist/ernie.mjs',import.meta.url).href}'`).replace("from'./music.mjs'",`from '${new URL('../dist/music.mjs',import.meta.url).href}'`).replace("from'./jenn-sprite.mjs'",`from '${new URL('../dist/jenn-sprite.mjs',import.meta.url).href}'`).replace("from'./engine.mjs'",`from '${new URL('../dist/engine.mjs',import.meta.url).href}'`)+ '\nexport {g,input,playing,showMenu,draw,jennImage,markImage,samuelImage};';
  let game=await import('data:text/javascript;base64,'+Buffer.from(source).toString('base64'));
