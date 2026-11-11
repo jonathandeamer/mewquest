@@ -13,6 +13,13 @@ Greetings are capitalised: Hi Rosie, Hi Ernie, Hi Minka And Darwin, Hi Mark and 
 
 Platforms are one-way: Mew jumps through from below and lands on top while falling. Rosie’s flag is beyond her raised ledge and activates after her greeting. Optional light-brown Dreamies are counted during play and in the larger ending popup naming Jenn and Samuel.
 
+## Mew Quest 3D
+A third-person 3D version of the same adventure lives at `dist/3d/` (open http://localhost:4173/3d/ when serving locally). Mew crosses a pond garden of lawns, stepping stones, a plank bridge, flowerpots, a brick terrace, walls, a shed roof and lily pads to reach Jenn and Samuel at the cottage door. The rules match the 2D game: capitalised greetings (Hi Rosie, Hi Ernie, Hi Mark after Ernie, Hi Minka And Darwin), ribbon gates that open after each greeting, Coco patrolling the bridge, harm-free returns to cosy cushions, 15 optional Dreamies and the same doorstep line and ending. Sprinklers pulse on and off with a sputter before they restart, one lily pad slides, and one gap needs a jump then a dash.
+
+Controls: arrows or WASD move, Space or C jumps, Shift or X dashes, R rests, Escape or P pauses, Enter starts. Phones get a floating thumb stick on the left and Jump, Dash and Rest buttons on the right. Sound is off until selected.
+
+Modules in `dist/3d/`: `course.mjs` (layout and simulation, no rendering), `toolkit.mjs` (materials, shapes, textures), `characters.mjs` (Mew, the cats, Jenn, Samuel, Mark and their animation), `scene.mjs` (the garden), `effects.mjs` (sparkles, pollen, smoke), `render.mjs` (soft-focus finish and automatic quality steps for slower phones), `labels.mjs`, `input.mjs`, `sound.mjs` and `game.mjs`, which ties them together. three.js r128 (MIT) is bundled at `dist/3d/vendor/three.min.js`, with public CDNs as fallbacks; if the game cannot start, the title card explains why. Reduced motion stills the grass, removes pollen and butterflies, and thins sparkles. `tests/course-3d.test.mjs` includes a scripted run through the whole course.
+
 ## Illustrated characters
 Jenn: `dist/assets/jenn-welcome.png`. Samuel: `dist/assets/samuel-illustrated.png`. Mark: `dist/assets/mark-stocky.png`.
 

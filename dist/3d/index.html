@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#4fb0ea">
+<meta name="description" content="Mew Quest 3D: guide Mew across the garden, say hi to her friends and get home to Jenn and Samuel.">
+<title>Mew Quest 3D</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Grandstander:wght@600;800&family=Nunito:wght@600;800&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <canvas id="c" tabindex="0" aria-label="Mew Quest 3D garden"></canvas>
+  <div id="labels"></div>
+  <div id="hud" hidden>
+    <div class="top">
+      <ul id="friends" aria-label="Friends to greet">
+        <li data-id="rosie" style="--fur:#a58c77"><i></i><span>Rosie</span></li>
+        <li data-id="ernie" style="--fur:#dc8b3d"><i></i><span>Ernie</span></li>
+        <li data-id="mark" class="person" style="--fur:#a9553d"><i></i><span>Mark</span></li>
+        <li data-id="darwin" style="--fur:#926443"><i></i><span>Darwin</span></li>
+        <li data-id="minka" style="--fur:#2a3238"><i></i><span>Minka</span></li>
+      </ul>
+      <div class="right">
+        <span class="pill" aria-label="Dreamies collected"><span class="biscuit"></span><span id="tcount">0 / 15</span></span>
+        <button id="sound" type="button" aria-pressed="false">Sound Off</button>
+        <button id="pause" type="button">Pause</button>
+      </div>
+    </div>
+    <div id="toast" role="status"></div>
+    <div id="keys">Move: arrows or WASD · Jump: Space · Dash: Shift · Rest: R</div>
+    <div id="stickzone"><div id="stick"><i></i></div></div>
+    <div id="pad">
+      <button id="rest" type="button">Rest</button>
+      <button id="dash" type="button">Dash</button>
+      <button id="jump" type="button">Jump</button>
+    </div>
+  </div>
+  <div id="overlay">
+    <div class="card">
+      <div class="family"><img alt="Jenn, crouching with her hand out" src="../assets/jenn-welcome-small.webp" width="223" height="440"><div class="mewface" aria-hidden="true"><b></b><b></b><s></s></div><img alt="Samuel, waving" src="../assets/samuel-illustrated-small.webp" width="220" height="440"></div>
+      <div class="eyebrow" id="eyebrow">Small paws. Big adventure.</div>
+      <h1 id="title">Mew Quest <em>3D</em></h1>
+      <p id="copy">Help Mew cross the garden, say hi to her friends, and get home to Jenn and Samuel.</p>
+      <div id="stats" hidden></div>
+      <div class="btns"><button id="start" type="button" disabled>Loading…</button><button id="sound2" type="button" aria-pressed="false">Sound Off</button></div>
+      <p id="err" role="alert" hidden></p>
+      <p class="how" id="how">Jump over Coco, dodge the sprinklers, and snack on Dreamies. If you slip, Mew just pops back to her cosy cushion.</p>
+    </div>
+  </div>
+</div>
+<audio id="music" loop preload="none" src="../assets/garden-treasures.wav"></audio>
+
+<script>
+// Start-up: load three.js (bundled copy first, public CDNs as fallbacks), then the game modules.
+// If anything stops the game starting, say why on the card instead of leaving a dead button.
+function mqFail(msg) {
+  var e = document.querySelector('#err'), b = document.querySelector('#start'), h = document.querySelector('#how');
+  if (e) { e.textContent = msg; e.hidden = false; }
+  if (b && !window.mqReady) { b.disabled = true; b.textContent = "Can't start"; }
+  if (h) h.hidden = true;
+}
+window.addEventListener('error', function (ev) {
+  if (!window.mqReady) mqFail('Mew Quest hit a problem on this device: ' + (ev.message || 'unknown error') + '. Try reloading, or open the page in Safari or Chrome.');
+});
+function mqBoot() {
+  if (!window.WebGLRenderingContext) { mqFail("This browser can't draw 3D graphics, so the garden can't be shown. Try Safari or Chrome."); return; }
+  import('./game.mjs').then(function (m) {
+    try { m.startGame(); } catch (e) {
+      var webgl = /WebGL/i.test(String(e && e.message));
+      mqFail(webgl ? "This browser has 3D graphics (WebGL) switched off, so the garden can't be drawn. On iPhone that usually means Lockdown Mode is on, or the page opened inside another app. Try opening it in Safari or Chrome."
+        : 'Mew Quest hit a problem on this device: ' + (e && e.message || e) + '. Try reloading, or open the page in Safari or Chrome.');
+      return;
+    }
+    window.mqReady = true; document.querySelector('#start').disabled = false;
+  }, function (e) { mqFail('The game files could not load: ' + (e && e.message || e) + '. Check your connection and reload.'); });
+}
+(function load(urls) {
+  if (!urls.length) { mqFail("The 3D engine couldn't be downloaded. A content blocker or a weak connection may be stopping it. Turn off any blocker for this page, then reload."); return; }
+  var sc = document.createElement('script'); sc.src = urls[0];
+  sc.onload = function () { if (window.THREE) mqBoot(); else load(urls.slice(1)); };
+  sc.onerror = function () { load(urls.slice(1)); };
+  document.head.appendChild(sc);
+})(['vendor/three.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js', 'https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js']);
+</script>
+</body>
+</html>
