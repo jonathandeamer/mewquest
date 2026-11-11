@@ -10,3 +10,18 @@ export function createPacer(step, maxFrame = .05) {
   };
 }
 export const mix = (a, b, t) => a + (b - a) * t;
+
+// Keep riders and the platforms carrying them on the same render timeline.
+export function rememberView(before, s) {
+  before.x = s.p.x; before.y = s.p.y; before.z = s.p.z; before.coco = s.L.coco.z;
+  before.platformX ??= [];
+  s.L.P.forEach((b, i) => { before.platformX[i] = b.x; });
+}
+export function blendView(view, before, s, alpha) {
+  Object.assign(view, s.p);
+  view.x = mix(before.x, s.p.x, alpha); view.y = mix(before.y, s.p.y, alpha); view.z = mix(before.z, s.p.z, alpha);
+  view.cocoZ = mix(before.coco, s.L.coco.z, alpha);
+  view.platformX ??= [];
+  s.L.P.forEach((b, i) => { view.platformX[i] = mix(before.platformX[i], b.x, alpha); });
+  return view;
+}

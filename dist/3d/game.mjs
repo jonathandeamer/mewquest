@@ -8,7 +8,7 @@ import { createRenderer, createPipeline } from './render.mjs';
 import { createLabels } from './labels.mjs';
 import { createSound } from './sound.mjs';
 import { createInput } from './input.mjs';
-import { createPacer, mix } from './pacing.mjs';
+import { createPacer, rememberView, blendView } from './pacing.mjs';
 
 const STEP = 1 / 120;
 const WHY = {
@@ -77,8 +77,8 @@ export function startGame() {
   }
   function clearInput() { input.clear(); s.lastJump = s.lastDash = false; }
   // Where things were one step ago, so each frame can draw a smooth blend of the last two steps (see pacing.mjs).
-  const pacer = createPacer(STEP), before = { x: 0, y: 0, z: 0, coco: 0 }, view = {};
-  function remember() { before.x = s.p.x; before.y = s.p.y; before.z = s.p.z; before.coco = s.L.coco.z; }
+  const pacer = createPacer(STEP), before = {}, view = {};
+  function remember() { rememberView(before, s); }
   function start() {
     if (s.won) { s = course.create(); camSnap = true; }
     pacer.reset(); remember();
@@ -185,8 +185,7 @@ export function startGame() {
     for (const e of s.events.splice(0)) handle(e);
     if (toastT > 0 && (toastT -= dt) <= 0) $('#toast').classList.remove('on');
     // Everything drawn this frame uses the blended position, not the raw latest step.
-    const p = Object.assign(view, s.p), home = s.reunion > 0 || s.won;
-    p.x = mix(before.x, s.p.x, alpha); p.y = mix(before.y, s.p.y, alpha); p.z = mix(before.z, s.p.z, alpha); p.cocoZ = mix(before.coco, s.L.coco.z, alpha);
+    const p = blendView(view, before, s, alpha), home = s.reunion > 0 || s.won;
     animateCharacters(dt, p, home);
     g.animate(tAll, s, camPos, p);
     fx.update(dt, tAll, p, camPos);

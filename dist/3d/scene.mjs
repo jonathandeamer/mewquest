@@ -159,7 +159,7 @@ export function buildWorld({ scene, sun }, course, { reduced }) {
   const D2 = new THREE.Object3D();
   function animate(tAll, s, camPos, p = s.p) {
     const t = s.time;
-    for (const m of movers) m.g.position.x = s.L.P[m.i].x;
+    for (const m of movers) m.g.position.x = p.platformX?.[m.i] ?? s.L.P[m.i].x;
     treats.forEach((g, i) => { if (g.visible) { g.rotation.y = tAll * 2 + i; g.position.y = s.L.treats[i].y + Math.sin(tAll * 2.4 + i) * .08; } });
     ducks.forEach((d, i) => { d.position.y = -.92 + Math.sin(tAll * 1.5 + i) * .03; d.rotation.y = Math.sin(tAll * .3 + i * 2) * 1.2; });
     flies.forEach(f => { const a = tAll * .5 + f.o; f.g.position.set(Math.sin(a * 1.3 + f.o) * 4.5, 1.3 + Math.sin(a * 2.1) * .5 + Math.max(0, p.y), p.z - 5 - f.o * 2.2 + Math.cos(a) * 2); f.g.rotation.y = a; f.wings.forEach((w, i) => w.rotation.z = (i ? 1 : -1) * Math.sin(tAll * 16 + f.o) * .9); });
