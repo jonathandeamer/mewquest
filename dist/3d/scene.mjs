@@ -157,8 +157,8 @@ export function buildWorld({ scene, sun }, course, { reduced }) {
 
   // Per-frame motion for everything in the garden that isn't a character.
   const D2 = new THREE.Object3D();
-  function animate(tAll, s, camPos) {
-    const p = s.p, t = s.time;
+  function animate(tAll, s, camPos, p = s.p) {
+    const t = s.time;
     for (const m of movers) m.g.position.x = s.L.P[m.i].x;
     treats.forEach((g, i) => { if (g.visible) { g.rotation.y = tAll * 2 + i; g.position.y = s.L.treats[i].y + Math.sin(tAll * 2.4 + i) * .08; } });
     ducks.forEach((d, i) => { d.position.y = -.92 + Math.sin(tAll * 1.5 + i) * .03; d.rotation.y = Math.sin(tAll * .3 + i * 2) * 1.2; });

@@ -2,6 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import * as course from '../dist/3d/course.mjs';
 import {createHold, keyAction} from '../dist/3d/input.mjs';
+import {createPacer, mix} from '../dist/3d/pacing.mjs';
 
 const STEP = 1 / 120;
 const tick = (s, input = {}, n = 1) => { for (let i = 0; i < n; i++) course.step(s, input, STEP); };
@@ -226,4 +227,30 @@ test('being lifted onto a low ledge is reported so the view can ease it', () => 
   assert.ok(ledge, 'stepping onto the doorstep raises a ledge event');
   assert.ok(Math.abs(ledge.lift - step.top) < 1e-9);
   assert.equal(s.p.y, step.top);
+});
+
+test('movement on screen is even at any refresh rate, despite fixed 1/120 s steps', () => {
+  // Something moving at a steady speed, drawn on screens whose frame times wobble by a millisecond or two.
+  const shownSpeedSpread = (hz, blend) => {
+    const pacer = createPacer(STEP); let pos = 0, prev = 0, last = 0, seed = 7; const speeds = [];
+    const rnd = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+    for (let f = 0; f < 400; f++) {
+      const dt = 1 / hz + (rnd() - .5) * .003, alpha = pacer.advance(dt, () => { prev = pos; pos += course.SPEED * STEP; });
+      const shown = blend ? mix(prev, pos, alpha) : pos;
+      if (f > 4) speeds.push((shown - last) / dt); last = shown;
+    }
+    return (Math.max(...speeds) - Math.min(...speeds)) / course.SPEED;
+  };
+  for (const hz of [60, 90, 120, 144]) {
+    assert.ok(shownSpeedSpread(hz, false) > .5, `${hz} Hz lurches without blending`);
+    assert.ok(shownSpeedSpread(hz, true) < 1e-6, `${hz} Hz is even with blending`);
+  }
+});
+
+test('the pacer runs whole steps, keeps the remainder and caps long frames', () => {
+  const pacer = createPacer(STEP); let n = 0;
+  assert.ok(Math.abs(pacer.advance(STEP * 2.5, () => n++) - .5) < 1e-9); assert.equal(n, 2);
+  assert.ok(Math.abs(pacer.advance(STEP * .75, () => n++) - .25) < 1e-9); assert.equal(n, 3);
+  n = 0; pacer.reset(); pacer.advance(10, () => n++);
+  assert.equal(n, 6, 'a long stall is capped at 0.05 s so Mew never leaps ahead');
 });
