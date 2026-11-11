@@ -105,14 +105,15 @@ export function startGame() {
   document.addEventListener('visibilitychange', () => { if (document.hidden) { clearInput(); pause(); } syncMusic(); });
 
   // ---------- course events: sounds, sparkles, toasts ----------
-  let squash = 0, heartsT = 0; const happy = {};
+  let squash = 0, heartsT = 0, hop = 0, cocoTurn = Math.PI; const happy = {};
   function handle(e) {
     const p = s.p, { sfx } = sound, { burst } = fx;
     if (e.t === 'jump') { sfx.jump(); squash = -.18; }
+    else if (e.t === 'ledge') hop = Math.min(.45, hop + e.lift); // Mew was lifted onto a ledge: ease her up instead of popping
     else if (e.t === 'land') { squash = .22; burst(p.x, p.y + .08, p.z, 4, 'puff', 1.6, .6); }
     else if (e.t === 'dash') { sfx.dash(); burst(p.x, p.y + .35, p.z, 6, 'star', 1.2, .8); }
     else if (e.t === 'treat') { sfx.treat(); burst(e.x, e.y, e.z, 9, 'star'); hud(); if (s.collected.size === TOTAL) toast('Every single Dreamie! What a feast.'); }
-    else if (e.t === 'rest') { sfx.rest(); burst(e.x, Math.max(e.y, -.5) + .4, e.z, 10, e.why === 'rest' ? 'star' : 'drop'); burst(p.x, p.y + .4, p.z, 10, 'star'); toast(WHY[e.why]); camSnap = true; }
+    else if (e.t === 'rest') { hop = 0; sfx.rest(); burst(e.x, Math.max(e.y, -.5) + .4, e.z, 10, e.why === 'rest' ? 'star' : 'drop'); burst(p.x, p.y + .4, p.z, 10, 'star'); toast(WHY[e.why]); camSnap = true; }
     else if (e.t === 'checkpoint') { sfx.flag(); const c = s.L.checkpoints[e.i]; burst(c.x + 1.2, c.y + 1.5, c.z, 10, 'star'); toast('Cosy cushion found. Mew will rest here.'); hud(); }
     else if (e.t === 'greet') { sfx.meow(); const stop = s.L.stops.find(x => x.id === e.id); burst(stop.x, stop.y + 1.2, stop.z, 10, 'heart', 1.6, 1.6); stop.ids.forEach(id => happy[id] = 1.2); hud(); }
     else if (e.t === 'say') { if (e.id === 'mark') { sfx.meow(); burst(mk.x, mk.y + 2.6, mk.z, 8, 'heart', 1.6, 1.6); } hud(); }
@@ -137,7 +138,8 @@ export function startGame() {
     const { mew, coco, friends, mark, samuel, jenn } = g;
     const sp = Math.hypot(p.vx, p.vz), amt = Math.min(1, sp / course.SPEED); if (live()) runPhase += sp * dt * 3.1;
     heading = lerpAngle(heading, playing ? Math.atan2(p.fx, p.fz) : Math.atan2(camPos.x - p.x, camPos.z - p.z), 1 - Math.exp(-14 * dt));
-    mew.position.set(p.x, p.y, p.z); mew.rotation.y = heading; squash *= Math.exp(-9 * dt);
+    hop *= Math.exp(-18 * dt);
+    mew.position.set(p.x, p.y - hop, p.z); mew.rotation.y = heading; squash *= Math.exp(-9 * dt);
     mew.userData.body.scale.set(1 + squash * .6, 1 - squash, p.dashT > 0 ? 1.25 : 1 + squash * .3);
     animWalk(mew, runPhase, amt, !p.grounded, tAll); mew.userData.eyes.forEach(e => e.scale.y = blink(tAll, 0));
     mew.userData.head.rotation.x = p.grounded ? Math.sin(tAll * 1.4) * .04 : -.15;
@@ -146,7 +148,7 @@ export function startGame() {
     if (g.mewBlob.visible) { g.mewBlob.position.set(p.x, gy + .03, p.z); const k = Math.max(.25, 1 - (p.y - gy) * .22) * .46; g.mewBlob.scale.set(k, k, 1); }
     mewBubble.pos.set(p.x, p.y + 1.25, p.z);
     let o = 0; for (const k in friends) { animSit(friends[k], tAll, o += 1.3, happy[k] || 0, p); if (happy[k] > 0) happy[k] = Math.max(0, happy[k] - dt); }
-    const c = s.L.coco; coco.position.set(c.x, c.y, c.z); coco.rotation.y = c.dir < 0 ? Math.PI : 0; animWalk(coco, s.time * 9, .8, false, tAll);
+    const c = s.L.coco; coco.position.set(c.x, c.y, c.z); cocoTurn = lerpAngle(cocoTurn, c.dir < 0 ? Math.PI : 0, 1 - Math.exp(-10 * dt)); coco.rotation.y = cocoTurn; animWalk(coco, s.time * 9, .8, false, tAll);
     coco.userData.eyes.forEach(e => e.scale.y = blink(tAll, 2)); g.cocoBlob.position.set(c.x, .03, c.z); cocoTag.pos.set(c.x, 1.25, c.z);
     mark.userData.bass.rotation.z = .45 + Math.sin(tAll * 4) * .015; mark.userData.head.rotation.z = Math.sin(tAll * 2) * .06; mark.position.y = mk.y + Math.abs(Math.sin(tAll * 4)) * .02;
     samuel.userData.wave.rotation.z = Math.sin(tAll * (home ? 11 : 6)) * .28; samuel.userData.head.rotation.z = Math.sin(tAll * 1.6) * .05; samuel.position.y = .3 + (home ? Math.abs(Math.sin(tAll * 7)) * .12 : 0);
@@ -187,5 +189,5 @@ export function startGame() {
 
   hud(); card('splash'); requestAnimationFrame(frame);
   // Hooks for browser checks and screenshots.
-  window.mewQuest3d = { get state() { return s; }, setQuality: q => pipeline.lock(q), get quality() { return pipeline.quality; } };
+  window.mewQuest3d = { scene: stage.scene, get state() { return s; }, setQuality: q => pipeline.lock(q), get quality() { return pipeline.quality; } };
 }

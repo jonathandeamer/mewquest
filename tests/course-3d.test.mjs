@@ -1,6 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import * as course from '../dist/3d/course.mjs';
+import {createHold, keyAction} from '../dist/3d/input.mjs';
 
 const STEP = 1 / 120;
 const tick = (s, input = {}, n = 1) => { for (let i = 0; i < n; i++) course.step(s, input, STEP); };
@@ -186,4 +187,43 @@ test('Coco and the sliding lily pad stay within their paths', () => {
     assert.ok(c.z >= c.min && c.z <= c.max);
     assert.ok(Math.abs(pad.x) <= pad.move.amp + 1e-9);
   }
+});
+
+test('a dash travels the same distance on diagonal keys as on the thumb stick', () => {
+  const dashLength = input => {
+    const s = course.create(); place(s, 0, 0, -5); tick(s, input, 12);
+    const x = s.p.x, z = s.p.z; tick(s, {...input, dash: true});
+    assert.ok(Math.abs(Math.hypot(s.p.fx, s.p.fz) - 1) < 1e-9, 'facing is a unit vector');
+    tick(s, {...input, dash: true}, Math.round(course.DASH_TIME * 120) - 1);
+    return Math.hypot(s.p.x - x, s.p.z - z);
+  };
+  const keys = dashLength({x: 1, y: 1}), stick = dashLength({x: Math.SQRT1_2, y: Math.SQRT1_2}), straight = dashLength({x: 0, y: 1});
+  assert.ok(Math.abs(keys - stick) < 1e-6, `keys ${keys.toFixed(3)} m, stick ${stick.toFixed(3)} m`);
+  assert.ok(Math.abs(keys - straight) < 1e-6);
+});
+
+test('a touch button stays held until every finger on it has lifted or been cancelled', () => {
+  const jump = createHold();
+  jump.press(1); jump.press(2);
+  jump.release(1);
+  assert.equal(jump.held, true, 'the second finger still holds Jump');
+  jump.release(2);
+  assert.equal(jump.held, false);
+  jump.release(2); jump.press(3); jump.clear();
+  assert.equal(jump.held, false, 'pause or focus loss releases everything');
+});
+
+test('keys map to actions whatever the letter case', () => {
+  assert.deepEqual(['ArrowUp', 'W', 'a', ' ', 'C', 'Shift', 'X', 'q', undefined].map(keyAction), ['u', 'u', 'l', 'jump', 'jump', 'dash', 'dash', null, null]);
+});
+
+test('being lifted onto a low ledge is reported so the view can ease it', () => {
+  const s = course.create(), step = s.L.P.find(b => b.type === 'step');
+  greetAll(s);
+  place(s, 2.5, 0, step.z + step.hd + .6); s.events.length = 0; // off to one side, outside the doorstep greeting
+  tick(s, {y: 1}, 30);
+  const ledge = s.events.find(e => e.t === 'ledge');
+  assert.ok(ledge, 'stepping onto the doorstep raises a ledge event');
+  assert.ok(Math.abs(ledge.lift - step.top) < 1e-9);
+  assert.equal(s.p.y, step.top);
 });
