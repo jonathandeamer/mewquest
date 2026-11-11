@@ -1,6 +1,8 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import * as course from '../dist/3d/course.mjs';
+import {createHold, keyAction} from '../dist/3d/input.mjs';
+import {createPacer, mix} from '../dist/3d/pacing.mjs';
 
 const STEP = 1 / 120;
 const tick = (s, input = {}, n = 1) => { for (let i = 0; i < n; i++) course.step(s, input, STEP); };
@@ -186,4 +188,69 @@ test('Coco and the sliding lily pad stay within their paths', () => {
     assert.ok(c.z >= c.min && c.z <= c.max);
     assert.ok(Math.abs(pad.x) <= pad.move.amp + 1e-9);
   }
+});
+
+test('a dash travels the same distance on diagonal keys as on the thumb stick', () => {
+  const dashLength = input => {
+    const s = course.create(); place(s, 0, 0, -5); tick(s, input, 12);
+    const x = s.p.x, z = s.p.z; tick(s, {...input, dash: true});
+    assert.ok(Math.abs(Math.hypot(s.p.fx, s.p.fz) - 1) < 1e-9, 'facing is a unit vector');
+    tick(s, {...input, dash: true}, Math.round(course.DASH_TIME * 120) - 1);
+    return Math.hypot(s.p.x - x, s.p.z - z);
+  };
+  const keys = dashLength({x: 1, y: 1}), stick = dashLength({x: Math.SQRT1_2, y: Math.SQRT1_2}), straight = dashLength({x: 0, y: 1});
+  assert.ok(Math.abs(keys - stick) < 1e-6, `keys ${keys.toFixed(3)} m, stick ${stick.toFixed(3)} m`);
+  assert.ok(Math.abs(keys - straight) < 1e-6);
+});
+
+test('a touch button stays held until every finger on it has lifted or been cancelled', () => {
+  const jump = createHold();
+  jump.press(1); jump.press(2);
+  jump.release(1);
+  assert.equal(jump.held, true, 'the second finger still holds Jump');
+  jump.release(2);
+  assert.equal(jump.held, false);
+  jump.release(2); jump.press(3); jump.clear();
+  assert.equal(jump.held, false, 'pause or focus loss releases everything');
+});
+
+test('keys map to actions whatever the letter case', () => {
+  assert.deepEqual(['ArrowUp', 'W', 'a', ' ', 'C', 'Shift', 'X', 'q', undefined].map(keyAction), ['u', 'u', 'l', 'jump', 'jump', 'dash', 'dash', null, null]);
+});
+
+test('being lifted onto a low ledge is reported so the view can ease it', () => {
+  const s = course.create(), step = s.L.P.find(b => b.type === 'step');
+  greetAll(s);
+  place(s, 2.5, 0, step.z + step.hd + .6); s.events.length = 0; // off to one side, outside the doorstep greeting
+  tick(s, {y: 1}, 30);
+  const ledge = s.events.find(e => e.t === 'ledge');
+  assert.ok(ledge, 'stepping onto the doorstep raises a ledge event');
+  assert.ok(Math.abs(ledge.lift - step.top) < 1e-9);
+  assert.equal(s.p.y, step.top);
+});
+
+test('movement on screen is even at any refresh rate, despite fixed 1/120 s steps', () => {
+  // Something moving at a steady speed, drawn on screens whose frame times wobble by a millisecond or two.
+  const shownSpeedSpread = (hz, blend) => {
+    const pacer = createPacer(STEP); let pos = 0, prev = 0, last = 0, seed = 7; const speeds = [];
+    const rnd = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+    for (let f = 0; f < 400; f++) {
+      const dt = 1 / hz + (rnd() - .5) * .003, alpha = pacer.advance(dt, () => { prev = pos; pos += course.SPEED * STEP; });
+      const shown = blend ? mix(prev, pos, alpha) : pos;
+      if (f > 4) speeds.push((shown - last) / dt); last = shown;
+    }
+    return (Math.max(...speeds) - Math.min(...speeds)) / course.SPEED;
+  };
+  for (const hz of [60, 90, 120, 144]) {
+    assert.ok(shownSpeedSpread(hz, false) > .5, `${hz} Hz lurches without blending`);
+    assert.ok(shownSpeedSpread(hz, true) < 1e-6, `${hz} Hz is even with blending`);
+  }
+});
+
+test('the pacer runs whole steps, keeps the remainder and caps long frames', () => {
+  const pacer = createPacer(STEP); let n = 0;
+  assert.ok(Math.abs(pacer.advance(STEP * 2.5, () => n++) - .5) < 1e-9); assert.equal(n, 2);
+  assert.ok(Math.abs(pacer.advance(STEP * .75, () => n++) - .25) < 1e-9); assert.equal(n, 3);
+  n = 0; pacer.reset(); pacer.advance(10, () => n++);
+  assert.equal(n, 6, 'a long stall is capped at 0.05 s so Mew never leaps ahead');
 });

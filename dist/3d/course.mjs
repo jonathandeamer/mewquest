@@ -95,7 +95,8 @@ export function step(s, inp = {}, dt = 1 / 120) {
   s.clock += dt;
 
   let ix = inp.x || 0, iy = inp.y || 0; const len = Math.hypot(ix, iy); if (len > 1) { ix /= len; iy /= len; }
-  if (len > 0.15) { p.fx = ix / len; p.fz = -iy / len; }
+  // Facing is a unit vector whatever the input device: two held keys give a length of 1.41 before clamping.
+  if (len > 0.15) { const n = Math.hypot(ix, iy); p.fx = ix / n; p.fz = -iy / n; }
   p.buffer = Math.max(0, p.buffer - dt); p.coyote = p.grounded ? 0.11 : Math.max(0, p.coyote - dt);
   if (inp.jump && !s.lastJump) p.buffer = 0.14;
   if (p.grounded && p.dashT <= 0) p.dashReady = true;
@@ -125,7 +126,7 @@ export function step(s, inp = {}, dt = 1 / 120) {
       if (b.kind === 'box') { nx = Math.max(b.x - b.hw, Math.min(b.x + b.hw, p.x)); nz = Math.max(b.z - b.hd, Math.min(b.z + b.hd, p.z)); }
       else { const d = Math.hypot(p.x - b.x, p.z - b.z) || 1e-6, k = Math.min(1, b.r / d); nx = b.x + (p.x - b.x) * k; nz = b.z + (p.z - b.z) * k; }
       const toward = (nx - p.x) * p.vx + (nz - p.z) * p.vz > 0.01 || (nx === p.x && nz === p.z);
-      if (b.top - p.y <= 0.42 && p.vy <= 0 && toward) { land(s, b); continue; }
+      if (b.top - p.y <= 0.42 && p.vy <= 0 && toward) { const lift = b.top - p.y; land(s, b); if (lift > 0.05) s.events.push({ t: 'ledge', lift }); continue; }
       if (b.kind === 'box') {
         const dx = p.x - b.x, dz = p.z - b.z, px = b.hw + R - Math.abs(dx), pz = b.hd + R - Math.abs(dz);
         if (px < pz) { p.x = b.x + Math.sign(dx || 1) * (b.hw + R); p.vx = 0; } else { p.z = b.z + Math.sign(dz || 1) * (b.hd + R); p.vz = 0; }

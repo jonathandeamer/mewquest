@@ -5,10 +5,17 @@ const KEYMAP = { ArrowLeft: 'l', a: 'l', ArrowRight: 'r', d: 'r', ArrowUp: 'u', 
 export const keyAction = key => key ? (KEYMAP[key] || KEYMAP[key.toLowerCase()] || null) : null;
 const STICK_RANGE = 46; // pixels from the touch point to full speed
 
+// Which fingers are holding a touch button. The button stays held until every finger that pressed it
+// has lifted or been cancelled, so a second finger brushing Jump can't cut the jump short.
+export function createHold() {
+  const ids = new Set();
+  return { press: id => { ids.add(id); }, release: id => { ids.delete(id); }, clear: () => { ids.clear(); }, get held() { return ids.size > 0; } };
+}
+
 // hooks: inMenu(), isPaused(), start(), togglePause(), rest(), onTouch()
 export function createInput(hooks) {
   const $ = q => document.querySelector(q);
-  const keys = {}, touch = { x: 0, y: 0, jump: false, dash: false }, state = { x: 0, y: 0, jump: false, dash: false };
+  const keys = {}, touch = { x: 0, y: 0 }, holds = { jump: createHold(), dash: createHold() }, state = { x: 0, y: 0, jump: false, dash: false };
   const zone = $('#stickzone'), stick = $('#stick'), knob = stick.firstElementChild;
   let stickId = null, sx0 = 0, sy0 = 0;
 
@@ -39,8 +46,8 @@ export function createInput(hooks) {
   zone.addEventListener('pointerup', stickEnd); zone.addEventListener('pointercancel', stickEnd);
 
   for (const k of ['jump', 'dash']) {
-    const b = $('#' + k), up = () => { touch[k] = false; b.classList.remove('down'); };
-    b.addEventListener('pointerdown', e => { e.preventDefault(); touch[k] = true; b.classList.add('down'); try { b.setPointerCapture(e.pointerId); } catch (_) { /* older browsers */ } });
+    const b = $('#' + k), hold = holds[k], up = e => { hold.release(e.pointerId); b.classList.toggle('down', hold.held); };
+    b.addEventListener('pointerdown', e => { e.preventDefault(); hold.press(e.pointerId); b.classList.add('down'); try { b.setPointerCapture(e.pointerId); } catch (_) { /* older browsers */ } });
     b.addEventListener('pointerup', up); b.addEventListener('pointercancel', up); b.addEventListener('lostpointercapture', up);
   }
   $('#rest').addEventListener('click', () => { if (!hooks.isPaused()) hooks.rest(); });
@@ -50,13 +57,13 @@ export function createInput(hooks) {
   // Merge keyboard and touch into one movement vector and two buttons.
   function read() {
     const kx = (keys.r ? 1 : 0) - (keys.l ? 1 : 0), ky = (keys.u ? 1 : 0) - (keys.d ? 1 : 0);
-    state.x = kx || touch.x; state.y = ky || touch.y; state.jump = !!keys.jump || touch.jump; state.dash = !!keys.dash || touch.dash;
+    state.x = kx || touch.x; state.y = ky || touch.y; state.jump = !!keys.jump || holds.jump.held; state.dash = !!keys.dash || holds.dash.held;
     return state;
   }
   // Let go of everything, e.g. on pause or when the window loses focus.
   function clear() {
     for (const k in keys) keys[k] = false;
-    touch.x = touch.y = 0; touch.jump = touch.dash = false;
+    touch.x = touch.y = 0; holds.jump.clear(); holds.dash.clear();
     stickId = null; stick.classList.remove('live'); knob.style.transform = ''; stick.style.left = stick.style.top = '';
     document.querySelectorAll('#pad .down').forEach(b => b.classList.remove('down'));
   }
