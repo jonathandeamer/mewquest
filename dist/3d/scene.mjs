@@ -44,11 +44,16 @@ export function buildWorld({ scene, sun }, course, { reduced }) {
       for (let z = b.z - b.hd + 1; z < b.z + b.hd - 1; z += 3.2) { const st = new THREE.Mesh(new THREE.PlaneGeometry(b.hw * 2 - 1, 1.6), M('#9ddb69', DECAL)); st.userData.noCast = true; st.rotation.x = -Math.PI / 2; st.position.set(b.x, b.top + .006, z + .8); world.add(st); }
     } else if (b.type === 'stone') { mk(CYL, stone, world, b.x, b.top - .7, b.z, b.r, 1.4, b.r); foamDisc(b.x, b.z, b.r); mk(CYL, stoneL, world, b.x, b.top - .04, b.z, b.r * .86, .1, b.r * .86); }
     else if (b.type === 'crate') { slab(b, texMat(woodTex, 1, 1), texMat(woodTex, 1, 1, '#f1dfc0')); const h = b.top - b.bottom; for (const y of [b.bottom + .08, b.top - .08]) mk(BOX, M('#a97f52'), world, b.x, y, b.z, b.hw * 2 + .08, .14, b.hd * 2 + .08); }
-    else if (b.type === 'planter') { slab(b, stone, grass); mk(BOX, stoneL, world, b.x, b.top - .08, b.z, b.hw * 2 + .16, .16, b.hd * 2 + .16); mk(BOX, grass, world, b.x, b.top - .045, b.z, b.hw * 2 - .3, .1, b.hd * 2 - .3); }
+    else if (b.type === 'planter') { slab(Object.assign({}, b, { top: b.top - .1 }), stone, grass); /* top sits inside the 16 cm rim, not level with it */ mk(BOX, stoneL, world, b.x, b.top - .08, b.z, b.hw * 2 + .16, .16, b.hd * 2 + .16); mk(BOX, grass, world, b.x, b.top - .045, b.z, b.hw * 2 - .3, .1, b.hd * 2 - .3); }
     else if (b.type === 'plank') { slab(b, texMat(woodTex, 1, 7)); for (let z = b.z - b.hd + .6; z < b.z + b.hd; z += 3.2) for (const sx of [-1, 1]) mk(CYL, M('#a97f52'), world, b.x + sx * (b.hw - .1), -.6, z, .11, 1.3, .11); }
     else if (b.type === 'pot') { const h = b.top - b.bottom, m = new THREE.Mesh(new THREE.CylinderGeometry(b.r * .96, b.r * .66, h, 20), terra); m.position.set(b.x, b.top - h / 2 - .1, b.z); world.add(m); foamDisc(b.x, b.z, b.r * .78); mk(CYL, terraD, world, b.x, b.top - .16, b.z, b.r + .04, .3, b.r + .04); mk(CYL, M('#8a6a50'), world, b.x, b.top - .02, b.z, b.r * .9, .05, b.r * .9); }
-    else if (b.type === 'terrace') { foamRect(b.x, b.z, b.hw, b.hd); slab(b, texMat(brickTex, 5, 3), M('#eadfc6')); mk(BOX, stoneL, world, b.x, b.top - .1, b.z, b.hw * 2 + .2, .2, b.hd * 2 + .2); mk(BOX, M('#eadfc6'), world, b.x, b.top - .05, b.z, b.hw * 2 - .2, .12, b.hd * 2 - .2); }
-    else if (b.type === 'wall') { foamRect(b.x, b.z, b.hw, b.hd); slab(b, texMat(brickTex, 1, 3)); mk(BOX, stoneL, world, b.x, b.top - .09, b.z, b.hw * 2 + .2, .18, b.hd * 2 + .1); }
+    else if (b.type === 'terrace') { foamRect(b.x, b.z, b.hw, b.hd); slab(Object.assign({}, b, { top: b.top - .15 }), texMat(brickTex, 5, 3), M('#eadfc6')); /* top sits inside the 20 cm rim */ mk(BOX, stoneL, world, b.x, b.top - .1, b.z, b.hw * 2 + .2, .2, b.hd * 2 + .2); mk(BOX, M('#eadfc6'), world, b.x, b.top - .05, b.z, b.hw * 2 - .2, .12, b.hd * 2 - .2); }
+    else if (b.type === 'wall') {
+      foamRect(b.x, b.z, b.hw, b.hd);
+      // Bury the brick top inside the 18 cm cap: coincident top faces flicker as the camera moves.
+      slab(Object.assign({}, b, { top: b.top - .16 }), texMat(brickTex, 1, 3));
+      mk(BOX, stoneL, world, b.x, b.top - .09, b.z, b.hw * 2 + .2, .18, b.hd * 2 + .1);
+    }
     else if (b.type === 'shed') {
       slab(b, texMat(woodTex, 4, 1, '#f0d2a8')); mk(BOX, M('#7f948c'), world, b.x, b.top - .12, b.z, b.hw * 2 + .5, .24, b.hd * 2 + .5); mk(BOX, M('#8fa49b'), world, b.x, b.top - .03, b.z, b.hw * 2 + .2, .08, b.hd * 2 + .2);
       const fz = b.z + b.hd + .03; mk(BOX, M('#8a9a76'), world, b.x - .7, 1.05, fz, 1.1, 2.1, .06); mk(SPH, M('#e9c35a'), world, b.x - .32, 1.05, fz + .05, .06, .06, .04); mk(BOX, M('#f6e7c2'), world, b.x + 1, 1.6, fz, .95, .8, .06); mk(BOX, M('#a9d0cb'), world, b.x + 1, 1.6, fz + .02, .75, .6, .06);
